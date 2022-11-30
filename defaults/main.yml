@@ -1,0 +1,18 @@
+
+# Oh My Fish install script options.
+omf_install: true
+omf_install_script_url: https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install
+omf_install_script_path: /tmp/omf-install
+
+# Oh My Fish directories.
+omf_install_dir: '{{ ansible_env.HOME }}/.local/share/omf'
+omf_config_dir: '{{ ansible_env.HOME }}/.config/omf'
+
+# List of Oh My Fish packages to install.
+omf_packages:
+  - https://github.com/edc/bass
+
+omf_theme: default
+
+# Set fish ans default shell.
+fish_set_as_default_shell: true

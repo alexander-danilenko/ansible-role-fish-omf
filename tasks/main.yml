@@ -1,0 +1,48 @@
+---
+
+- name: 'Install "fish" package'
+  become: true
+  package:
+    name: fish
+    state: present
+
+- name: 'Download oh-my-fish install script'
+  when: omf_install
+  get_url:
+    url: '{{ omf_install_script_url }}'
+    dest: '{{ omf_install_script_path }}'
+    mode: '0755'
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: 'Install oh-my-fish'
+  when: omf_install
+  shell:
+    cmd: "fish '{{ omf_install_script_path }}' --noninteractive --yes --path={{ omf_install_dir }} --config={{ omf_config_dir }}"
+    executable: /usr/bin/bash
+  
+- name: 'Install oh-my-fish packages'
+  when: omf_install
+  loop: '{{ omf_packages | default([]) }}'
+  shell:
+    cmd: "omf install {{ item }}"
+    executable: /usr/bin/fish
+
+- name: 'Install and set oh-my-fish theme'
+  when: omf_install
+  shell:
+    cmd: "omf install {{ omf_theme }} && omf theme {{ omf_theme }}"
+    executable: /usr/bin/fish
+
+- name: '(RedHat specific) Install "util-linux-user" package'
+  when: fish_set_as_default_shell and ansible_facts["os_family"] == 'RedHat'  
+  become: true
+  package:
+    name: util-linux-user
+    state: present
+
+- name: 'Set fish as a default shell'
+  when: fish_set_as_default_shell
+  become: true
+  shell: 'chsh -s $(which fish)'
+  args:
+    executable: '/bin/bash'
